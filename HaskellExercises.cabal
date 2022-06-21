@@ -26,6 +26,11 @@ source-repository head
 library
   exposed-modules:
       Lib
+      MyMonad.Reader
+      MyMonad.State
+      MyMonadT.EitherT
+      MyMonadT.MaybeT
+      MyMonadT.ReaderT
   other-modules:
       Paths_HaskellExercises
   hs-source-dirs:

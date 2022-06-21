@@ -1,5 +1,12 @@
 {-# LANGUAGE InstanceSigs #-}
 
+module MyMonad.Reader
+  ( Reader,
+    ask,
+    compute,
+    runReader,
+  ) where
+
 newtype Reader a b = Reader { runReader :: a -> b }
 
 instance Functor (Reader a) where
@@ -28,7 +35,3 @@ compute :: Reader String Int
 compute = do
   name <- ask
   return 1
-
-main :: IO ()
-main = do
-  print $ runReader compute "Ayden"

@@ -1,5 +1,9 @@
 {-# LANGUAGE LambdaCase, InstanceSigs #-}
 
+module MyMonadT.MaybeT
+  (MaybeT'
+   ) where
+
 newtype MaybeT' f a = MaybeT' { runMaybeT :: f (Maybe a) }
 instance Functor f => Functor (MaybeT' f) where
   fmap f (MaybeT' a) = MaybeT' $ (fmap . fmap) f a

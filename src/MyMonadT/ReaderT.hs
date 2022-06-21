@@ -1,3 +1,9 @@
+
+module MyMonadT.ReaderT
+  (Reader',
+   ask
+  ) where
+
 import Control.Applicative
 
 boop :: Integer -> Integer

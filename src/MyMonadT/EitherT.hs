@@ -1,5 +1,10 @@
 {-# LANGUAGE LambdaCase #-}
 
+module MyMonadT.EitherT
+  (EitherT',
+   eitherT'
+  ) where
+
 newtype EitherT' e m a = EitherT' { runEitherT' :: m (Either e a) }
 
 instance Functor m => Functor (EitherT' e m) where

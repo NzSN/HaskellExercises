@@ -2,7 +2,8 @@
 module MyMonad.State
   ( State',
     rollDieThreeTimes,
-    rollDieThreeTimes'
+    rollDieThreeTimes',
+    infiniteDie
   ) where
 
 
@@ -53,3 +54,26 @@ rollDie' = intToDie <$> state (randomR (1, 6))
 
 rollDieThreeTimes' :: State StdGen (Die, Die, Die)
 rollDieThreeTimes' = liftA3 (,,) rollDie rollDie rollDie
+
+infiniteDie :: State StdGen [Die]
+infiniteDie = repeat <$> rollDie
+
+nDie :: Int -> State StdGen [Die]
+nDie n = replicateM n rollDie
+
+rollsToGetTwenty :: StdGen -> Int
+rollsToGetTwenty = step 0 0
+  where
+    step :: Int -> Int -> StdGen -> Int
+    step sum count gen
+      | sum > 20 = count
+      | otherwise =
+        let (die, nextGen) = randomR (1, 6) gen
+        in step (sum + die) (count + 1) nextGen
+
+-- Exercises
+rollsToGetN :: Int -> StdGen -> Int
+rollsToGetN = undefined
+
+rollsCountLogged :: Int -> StdGen -> (Int, [Die])
+rollsCountLogged = undefined

@@ -100,3 +100,6 @@ instance Functor (Moi s) where
 instance Applicative (Moi s) where
   pure :: a -> Moi s a
   pure a = Moi $ \s -> (a, s)
+
+  (<*>) :: Moi s (a -> b) -> Moi s a -> Moi s b
+  (Moi f) <*> (Moi a) = undefined

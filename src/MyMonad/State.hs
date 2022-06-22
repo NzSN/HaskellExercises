@@ -1,9 +1,11 @@
+{-# LANGUAGE InstanceSigs #-}
 
 module MyMonad.State
   ( State',
     rollDieThreeTimes,
     rollDieThreeTimes',
-    infiniteDie
+    infiniteDie,
+    rollsToGetN
   ) where
 
 
@@ -73,7 +75,28 @@ rollsToGetTwenty = step 0 0
 
 -- Exercises
 rollsToGetN :: Int -> StdGen -> Int
-rollsToGetN = undefined
+rollsToGetN limit = step 0 0
+  where
+    step sum count gen
+      | sum > limit = count
+      | otherwise =
+        let (die, nextGen) = randomR (1, 6) gen
+        in step (sum + die) (count + 1) nextGen
+
+    step :: Int -> Int -> StdGen -> Int
 
 rollsCountLogged :: Int -> StdGen -> (Int, [Die])
 rollsCountLogged = undefined
+
+
+-- Write Your Own State
+newtype Moi s a =
+  Moi { runMoi :: s -> (a, s) }
+
+instance Functor (Moi s) where
+  fmap :: (a -> b) -> Moi s a -> Moi s b
+  fmap f (Moi a) = Moi $ fmap ((,) <$> (f . fst) <*> snd) a
+
+instance Applicative (Moi s) where
+  pure :: a -> Moi s a
+  pure a = Moi $ \s -> (a, s)

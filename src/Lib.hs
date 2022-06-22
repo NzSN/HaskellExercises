@@ -3,7 +3,12 @@ module Lib
     ) where
 
 import MyMonad.Reader ( compute, Reader(runReader) )
-import MyMonad.State ( rollDieThreeTimes, rollDieThreeTimes', infiniteDie )
+import MyMonad.State (
+  rollDieThreeTimes,
+  rollDieThreeTimes',
+  infiniteDie,
+  rollsToGetN)
+
 import Control.Monad.Trans.State ( evalState )
 import System.Random ( mkStdGen )
 
@@ -13,3 +18,4 @@ someFunc = do
   print rollDieThreeTimes
   print $ evalState rollDieThreeTimes' (mkStdGen 1)
   print $ take 6 $ evalState infiniteDie (mkStdGen 1)
+  print $ rollsToGetN 40 (mkStdGen 1)

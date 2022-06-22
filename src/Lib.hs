@@ -3,6 +3,12 @@ module Lib
     ) where
 
 import MyMonad.Reader
+import MyMonad.State
+import Control.Monad.Trans.State
+import System.Random
 
 someFunc :: IO ()
-someFunc = print $ runReader compute "Ayden"
+someFunc = do
+  print $ runReader compute "Ayden"
+  print rollDieThreeTimes
+  print $ evalState rollDieThreeTimes' (mkStdGen 1)

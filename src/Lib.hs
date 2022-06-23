@@ -10,7 +10,8 @@ import MyMonad.State (
   rollDieThreeTimes',
   infiniteDie,
   rollsToGetN,
-  Moi(..))
+  Moi(..),
+  fizzBuzzMain)
 
 import Control.Monad.Trans.State ( evalState )
 import System.Random ( mkStdGen )
@@ -25,3 +26,5 @@ someFunc = do
 
   let a = Moi (1,)
   print $ runMoi a 1
+
+  fizzBuzzMain

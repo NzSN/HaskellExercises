@@ -6,13 +6,17 @@ module MyMonad.State
     rollDieThreeTimes',
     infiniteDie,
     rollsToGetN,
-    Moi(..)
+    Moi(..),
+    fizzBuzzMain,
+    get',
+    put',
+    modify'
   ) where
 
 
 import Control.Applicative (liftA3)
 import Control.Monad (replicateM)
-import Control.Monad.Trans.State (State, state)
+import Control.Monad.Trans.State (State, state, put, get, execState)
 import System.Random ( mkStdGen, Random(randomR), StdGen )
 
 
@@ -100,13 +104,47 @@ instance Applicative (Moi s) where
   pure a = Moi (a,)
 
   (<*>) :: Moi s (a -> b) -> Moi s a -> Moi s b
-  (Moi f) <*> (Moi a) = Moi $ g <$> f <*> a
-    where
-      g :: (a -> b, s) -> (a, s) -> (b, s)
-      g (f, _) (a, s) = (f a, s)
+  (Moi g) <*> (Moi a) = Moi $
+    \s -> let (f, s') = g s
+              (a', s'') = a s'
+          in (f a', s'')
 
 instance Monad (Moi s) where
   return = pure
 
   (>>=) :: Moi s a -> (a -> Moi s b) -> Moi s b
-  (Moi a) >>= f = Moi $ a >>= \(a, s) -> runMoi $ f a
+  (Moi g) >>= f = Moi $ \s -> let (a, s') = g s in runMoi (f a) s'
+
+get' :: Moi s s
+get' = Moi $ \x -> (x, x)
+
+put' :: s -> Moi s ()
+put' s = Moi $ const ((), s)
+
+exec :: Moi s a -> s -> s
+exec a = snd. runMoi a
+
+eval :: Moi s a -> s -> a
+eval a = fst . runMoi a
+
+modify' :: (s -> s) -> Moi s ()
+modify' f = Moi $ \s -> ((), f s)
+
+-- FizzBuzz
+fizzBuzz :: Integer -> String
+fizzBuzz n | n `mod` 15 == 0 = "FizzBuzz"
+           | n `mod` 5  == 0 = "Buzz"
+           | n `mod` 3  == 0 = "Fizz"
+           | otherwise       = show n
+
+fizzbuzzList :: [Integer] -> [String]
+fizzbuzzList list = execState (mapM_ addResult list) []
+
+addResult :: Integer -> State [String] ()
+addResult n = do
+  xs <- get
+  let result = fizzBuzz n
+  put (result : xs)
+
+fizzBuzzMain :: IO ()
+fizzBuzzMain = mapM_ putStrLn $ reverse $ fizzbuzzList [1..100]

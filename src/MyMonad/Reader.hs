@@ -1,10 +1,9 @@
 {-# LANGUAGE InstanceSigs #-}
 
 module MyMonad.Reader
-  ( Reader,
+  ( Reader(..),
     ask,
     compute,
-    runReader,
   ) where
 
 newtype Reader a b = Reader { runReader :: a -> b }

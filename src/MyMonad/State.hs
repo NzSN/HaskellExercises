@@ -1,11 +1,12 @@
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TupleSections #-}
 
 module MyMonad.State
-  ( State',
-    rollDieThreeTimes,
+  ( rollDieThreeTimes,
     rollDieThreeTimes',
     infiniteDie,
-    rollsToGetN
+    rollsToGetN,
+    Moi(..)
   ) where
 
 
@@ -14,9 +15,6 @@ import Control.Monad (replicateM)
 import Control.Monad.Trans.State (State, state)
 import System.Random ( mkStdGen, Random(randomR), StdGen )
 
-
-newtype State' s a =
-  State' { runState :: s -> (a, s) }
 
 data Die =
     DieOne
@@ -99,7 +97,16 @@ instance Functor (Moi s) where
 
 instance Applicative (Moi s) where
   pure :: a -> Moi s a
-  pure a = Moi $ \s -> (a, s)
+  pure a = Moi (a,)
 
   (<*>) :: Moi s (a -> b) -> Moi s a -> Moi s b
-  (Moi f) <*> (Moi a) = undefined
+  (Moi f) <*> (Moi a) = Moi $ g <$> f <*> a
+    where
+      g :: (a -> b, s) -> (a, s) -> (b, s)
+      g (f, _) (a, s) = (f a, s)
+
+instance Monad (Moi s) where
+  return = pure
+
+  (>>=) :: Moi s a -> (a -> Moi s b) -> Moi s b
+  (Moi a) >>= f = Moi $ a >>= \(a, s) -> runMoi $ f a

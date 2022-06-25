@@ -1,10 +1,13 @@
 {-# LANGUAGE LambdaCase, InstanceSigs #-}
 
 module MyMonadT.MaybeT
-  (MaybeT'
+  ( MaybeT'(..),
+    lift
    ) where
 
-newtype MaybeT' f a = MaybeT' { runMaybeT :: f (Maybe a) }
+import Control.Monad.Trans
+
+newtype MaybeT' f a = MaybeT' { runMaybeT' :: f (Maybe a) }
 instance Functor f => Functor (MaybeT' f) where
   fmap f (MaybeT' a) = MaybeT' $ (fmap . fmap) f a
 
@@ -20,4 +23,7 @@ instance Monad f => Monad (MaybeT' f) where
   (MaybeT' a) >>= f = MaybeT' $ a >>=
     \case
       Nothing -> return Nothing
-      Just y -> runMaybeT (f y)
+      Just y -> runMaybeT' (f y)
+
+instance MonadTrans MaybeT' where
+  lift = MaybeT' . fmap Just
